@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Contact – Diplosoft Media Concept</title>
+	<link rel="stylesheet" href="assets/css/style.css">
+	<link rel="icon" href="assets/img/favicon.ico" sizes="any">
+</head>
+<body>
+	<header>
+		<div class="container nav">
+			<a class="brand" href="./"><img class="brand-logo" src="assets/img/diplosoft_logo_web.png.png" alt="Diplosoft Media Concept logo" width="36" height="36"><span>Diplosoft Media Concept</span></a>
+			<nav>
+				<button class="menu-toggle" aria-label="Toggle menu">☰</button>
+				<div class="nav-links">
+					<a href="index.html">Home</a>
+					<a href="live-streaming.html">Live Streaming</a>
+					<a href="videography.html">Videography</a>
+					<a href="photography.html">Photography</a>
+					<a class="nav-cta" href="contact.html">Contact</a>
+				</div>
+			</nav>
+		</div>
+	</header>
+	<main>
+		<section class="section">
+			<div class="container">
+				<h1 class="h2">Let’s talk</h1>
+				<p class="lead">Share a few details and we’ll be in touch.</p>
+				<form class="grid" onsubmit="event.preventDefault(); alert('Thanks! We\'ll get back to you shortly.'); this.reset();">
+					<div class="form-row">
+						<input class="input" required placeholder="Full name" name="name">
+						<input class="input" required placeholder="Email address" type="email" name="email">
+					</div>
+					<div class="form-row">
+						<input class="input" placeholder="Phone (optional)" name="phone">
+						<input class="input" required placeholder="Subject" name="subject">
+					</div>
+					<textarea class="input" required placeholder="How can we help?" name="message"></textarea>
+					<div><button class="btn primary" type="submit">Send message</button></div>
+				</form>
+			</div>
+		</section>
+	</main>
+	<footer>
+		<div class="container subfooter">© <span id="year"></span> Diplosoft Media Concept</div>
+	</footer>
+	<script src="assets/js/main.js"></script>
+	<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

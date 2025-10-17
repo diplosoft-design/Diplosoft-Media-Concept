@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Register — Diplosoft</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+  <main>
+    <section class="section">
+      <div class="container">
+        <h1>Create admin account</h1>
+        <p class="lead">Register an admin user (email/password). After creating the user, map their uid into <code>public.admins</code> in Supabase SQL editor.</p>
+        <form id="admin-register" class="grid">
+          <input class="input" name="email" type="email" placeholder="Email" required>
+          <input class="input" name="password" type="password" placeholder="Password (min 6)" required>
+          <div><button class="btn primary" type="submit">Register</button></div>
+        </form>
+        <div id="register-error" style="color:crimson;margin-top:12px;"></div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="/assets/js/admin.js"></script>
+</body>
+</html>

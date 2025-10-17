@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS public.contacts (
   phone text,
   subject text,
   message text NOT NULL,
+  handled boolean DEFAULT false,
   created_at timestamptz DEFAULT now()
 );
 

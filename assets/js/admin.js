@@ -15,6 +15,22 @@ if (pathname.endsWith('/admin/dashboard.html') || pathname === '/admin/dashboard
       location.href = '/admin/login.html'
       return
     }
+    // Ensure current user is an admin (check admins table)
+    try {
+      const { data: admins, error: aErr } = await supabase.from('admins').select('id').eq('id', session.user.id).limit(1)
+      if (aErr) throw aErr
+      if (!admins || admins.length === 0) {
+        // Not an admin — redirect to login (or show no-permission)
+        alert('You are not authorized to view this page. Contact the site owner.')
+        await supabase.auth.signOut()
+        location.href = '/admin/login.html'
+        return
+      }
+    } catch (err) {
+      console.error('Admin check failed', err)
+      alert('Authorization check failed. See console for details.')
+      return
+    }
 
     // Fetch contacts
     const listEl = document.getElementById('contacts-list')
@@ -27,13 +43,51 @@ if (pathname.endsWith('/admin/dashboard.html') || pathname === '/admin/dashboard
       }
 
       const html = data.map(c => `
-        <div class="card" style="margin-bottom:12px;padding:12px;">
-          <strong>${escapeHtml(c.name || '')}</strong> — <a href="mailto:${escapeHtml(c.email || '')}">${escapeHtml(c.email || '')}</a>
+        <div class="card" data-id="${c.id}" style="margin-bottom:12px;padding:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <strong>${escapeHtml(c.name || '')}</strong>
+            <div>
+              <button class="btn small mark-handled" data-id="${c.id}">${c.handled ? 'Handled' : 'Mark handled'}</button>
+              <button class="btn small danger delete-contact" data-id="${c.id}">Delete</button>
+            </div>
+          </div>
           <div style="margin-top:6px;white-space:pre-wrap">${escapeHtml(c.message || '')}</div>
           <div style="font-size:12px;color:#666;margin-top:6px">${new Date(c.created_at).toLocaleString()}</div>
         </div>
       `).join('\n')
       listEl.innerHTML = html
+
+      // Wire action buttons
+      document.querySelectorAll('.mark-handled').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const id = btn.dataset.id
+          try {
+            const { error: uErr } = await supabase.from('contacts').update({ handled: true }).eq('id', id)
+            if (uErr) throw uErr
+            btn.textContent = 'Handled'
+            btn.disabled = true
+          } catch (err) {
+            console.error('Mark handled error', err)
+            alert('Failed to mark handled. See console for details.')
+          }
+        })
+      })
+
+      document.querySelectorAll('.delete-contact').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const id = btn.dataset.id
+          if (!confirm('Delete this contact? This cannot be undone.')) return
+          try {
+            const { error: dErr } = await supabase.from('contacts').delete().eq('id', id)
+            if (dErr) throw dErr
+            const el = document.querySelector(`.card[data-id="${id}"]`)
+            if (el) el.remove()
+          } catch (err) {
+            console.error('Delete error', err)
+            alert('Failed to delete contact. See console for details.')
+          }
+        })
+      })
     } catch (err) {
       console.error(err)
       listEl.textContent = 'Error loading contacts. Check console.'

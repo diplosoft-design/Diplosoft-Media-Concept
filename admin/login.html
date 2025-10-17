@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Login — Diplosoft</title>
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body>
+  <main>
+    <section class="section">
+      <div class="container">
+        <h1>Admin sign in</h1>
+        <p class="lead">Sign in with your admin account to manage contacts.</p>
+        <form id="admin-login" class="grid">
+          <input class="input" name="email" type="email" placeholder="Email" required>
+          <input class="input" name="password" type="password" placeholder="Password" required>
+          <div><button class="btn primary" type="submit">Sign in</button></div>
+        </form>
+        <div id="login-error" style="color:crimson;margin-top:12px;"></div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="/assets/js/admin.js"></script>
+</body>
+</html>

@@ -52,3 +52,6 @@ if (form) {
     }
   })
 }
+
+// Export the client for reuse in other modules (admin pages)
+export { supabase }

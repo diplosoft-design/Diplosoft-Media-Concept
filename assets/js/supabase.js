@@ -8,7 +8,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-// Contact form handling
+// Contact form handling with improved diagnostics
 const form = document.getElementById('contact-form')
 if (form) {
   form.addEventListener('submit', async (e) => {
@@ -28,14 +28,27 @@ if (form) {
       return
     }
 
+    // Optional quick network/endpoint check for easier debugging on remote hosts
     try {
+      // Attempt the insert and capture detailed error information
       const { data, error } = await supabase.from('contacts').insert([payload])
-      if (error) throw error
+      if (error) {
+        // Log full error object for debugging
+        console.error('Supabase insert error:', error)
+        // Show a helpful alert including common failure reasons
+        const userMessage = `Error submitting form: ${error.message || error.name || 'unknown error'}`
+        alert(userMessage + '\n\nCommon causes: table not created, RLS blocking anonymous inserts, or CORS settings in Supabase project. Check browser console for full details.')
+        return
+      }
+
       alert('Thanks — your message has been sent.')
       form.reset()
     } catch (err) {
-      console.error(err)
-      alert('There was an error submitting the form. Check console for details.')
+      // This catch will surface network / unexpected errors (CORS, network, module issues)
+      console.error('Unexpected error submitting contact form:', err)
+      let details = ''
+      try { details = JSON.stringify(err) } catch (e) { details = String(err) }
+      alert('There was an error submitting the form.\n\nDetails: ' + (err.message || details) + '\n\nOpen the browser console for full details.')
     }
   })
 }

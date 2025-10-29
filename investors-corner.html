@@ -354,69 +354,63 @@
 						<div>
 							<h4>Social Media</h4>
 							<p><strong>Follow Us:</strong><br>
-							@DiplosoftMediaConcept</p>
-							<p><strong>Website:</strong><br>
-							diplosoft-design.github.io/Diplosoft-Media-Concept</p>
-						</div>
-					</div>
-				</div>
-				<div class="hero-cta">
-					<a class="btn primary" href="contact.html">Schedule Meeting</a>
-					<a class="btn" href="mailto:DiplosoftMediaConcept@gmail.com">Email Us</a>
-				</div>
-			</div>
-		</section>
-	</main>
-
-	<footer>
-		<div class="container footer-grid">
-			<div>
-				<div class="brand"><img class="brand-logo" src="assets/img/diplosoft_logo_web.png.png" alt="Diplosoft Media Concept logo" width="36" height="36"><span>Diplosoft Media Concept</span></div>
-				<p class="lead">Creating new possibilities in live streaming, videography and photography.</p>
-			</div>
-			<div>
-				<h4>Company</h4>
-				<div><a href="about.html">About</a></div>
-				<div><a href="contact.html">Contact</a></div>
-				<div><a href="investors-corner.html">Investors' Corner</a></div>
-			</div>
-			<div>
-				<h4>Services</h4>
-				<div><a href="live-streaming.html">Live Streaming</a></div>
-				<div><a href="videography.html">Videography</a></div>
-				<div><a href="photography.html">Photography</a></div>
-			</div>
-			<div>
-				<h4>Legal</h4>
-				<div><a href="terms.html">Terms & Conditions</a></div>
-				<div><a href="privacy.html">Privacy Policy</a></div>
-			</div>
-		</div>
-		<div class="container subfooter">
-			<div>© <span id="year"></span> Diplosoft Media Concept. All Rights Reserved.</div>
-		</div>
-	</footer>
-	<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
-	<script>
-		// Exchange rate updater
-		async function updateExchangeRates() {
-			try {
-				// Using a free exchange rate API
-				const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-				const data = await response.json();
-				const ngnRate = data.rates.NGN;
+							<script>
+								// Inverse exchange rate updater: convert NGN amounts on the page to USD equivalents
+								async function updateExchangeRates() {
+									try {
+										// Get latest NGN per USD (1 USD = ngnRate NGN)
+										const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+										const data = await response.json();
+										const ngnRate = data.rates.NGN;
 				
-				// Update all USD amounts with current NGN conversion
-				const usdAmounts = [
-					{ selector: '$42 billion', amount: 42000000000 },
-					{ selector: '$6–8 billion', amount: 7000000000 },
-					{ selector: '$10 million', amount: 10000000 },
-					{ selector: '$50M', amount: 50000000 },
-					/* $25,000 was converted to NGN on the page; removed selector to avoid duplicate replacements */
-					{ selector: '$13,150', amount: 13150 },
-					{ selector: '$3,950', amount: 3950 },
-					{ selector: '$4,600', amount: 4600 },
-					{ selector: '$2,000', amount: 2000 },
+										// Walk text nodes and replace NGN occurrences with NGN (US$X) where X = NGN / ngnRate
+										const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+										const textNodes = [];
+										while (walker.nextNode()) textNodes.push(walker.currentNode);
+				
+										// Regex captures amounts like: ₦10,000,000  or  ₦5.2 million  or ₦3.2 trillion
+										const ngnRegex = /₦\s*([\d,]+(?:\.\d+)?)(?:\s*(million|billion|trillion))?/gi;
+				
+										textNodes.forEach(node => {
+											if (!node.nodeValue || node.nodeValue.indexOf('₦') === -1) return;
+											// Avoid touching nodes that already show a USD conversion
+											if (node.nodeValue.indexOf('(US$') !== -1 || node.nodeValue.indexOf('(USD') !== -1) return;
+											// Avoid script/style containers
+											if (node.parentNode && (node.parentNode.closest && node.parentNode.closest('script, style'))) return;
+					
+											const newText = node.nodeValue.replace(ngnRegex, (match, numStr, scale) => {
+												// parse numeric part
+												const raw = (numStr || '').replace(/,/g, '');
+												let amount = parseFloat(raw);
+												if (isNaN(amount)) return match;
+												let multiplier = 1;
+												if (scale) {
+													const s = scale.toLowerCase();
+													if (s === 'million') multiplier = 1e6;
+													else if (s === 'billion') multiplier = 1e9;
+													else if (s === 'trillion') multiplier = 1e12;
+												}
+												const ngnAmount = amount * multiplier;
+												const usd = ngnAmount / ngnRate;
+												const usdDisplay = Number(usd.toFixed(2)).toLocaleString('en-US', {maximumFractionDigits: 2});
+												return `${match} (US$${usdDisplay})`;
+											});
+											if (newText !== node.nodeValue) node.nodeValue = newText;
+										});
+				
+										// Add exchange rate info
+										const rateInfo = document.createElement('div');
+										rateInfo.style.cssText = 'text-align: center; margin-top: 20px; font-size: 12px; color: var(--color-muted);';
+										rateInfo.innerHTML = `Exchange Rate: 1 USD = ₦${ngnRate.toFixed(2)} (Updated: ${new Date().toLocaleDateString()})`;
+										document.querySelector('.container').appendChild(rateInfo);
+									} catch (error) {
+										console.log('Exchange rate update failed:', error);
+									}
+								}
+
+								// Update rates on page load
+								document.addEventListener('DOMContentLoaded', updateExchangeRates);
+							</script>
 					{ selector: '$10,000–$15,000', amount: 12500 },
 					/* $25,000+ was converted to NGN on the page; removed selector to avoid duplicate replacements */
 				];

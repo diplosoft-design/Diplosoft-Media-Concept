@@ -126,3 +126,16 @@ textarea { min-height: 140px; resize: vertical; }
   .btn, .card { transition: none; }
   .nav-links a:after { transition: none; }
 }
+
+/* Responsive tables: hide headers and show labeled rows on small screens */
+.responsive-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+.responsive-table th, .responsive-table td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.responsive-table thead th { font-weight: 700; color: var(--color-text); }
+
+@media (max-width: 720px) {
+  .responsive-table { border: 0; }
+  .responsive-table thead { display: none; }
+  .responsive-table tbody tr { display: block; margin-bottom: 12px; background: rgba(18,19,23,0.6); border-radius: 12px; padding: 10px; }
+  .responsive-table tbody td { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: none; }
+  .responsive-table tbody td:before { content: attr(data-label); color: var(--color-muted); font-weight: 600; margin-right: 8px; }
+}
